@@ -107,13 +107,13 @@ func main() {
 	}); err != nil {
 		log.Fatal(err)
 	}
+
 	for i, s := range env {
 		if strings.HasPrefix(s, "GOROOT") {
 			env[i] = `OLD` + s
 			break
 		}
 	}
-
 	args := []string{"install", "-m"}
 	args = append(args, (strings.Split(stdlibs, " "))...)
 
@@ -144,6 +144,7 @@ func main() {
 			log.Fatal(err)
 		}
 		defer f.Close()
+
 		names, err := f.Readdirnames(-1)
 		if err != nil {
 			log.Fatal(err)
@@ -155,13 +156,14 @@ func main() {
 			}
 		}
 	}
+
 	for _, dir := range alldirs {
 		os.RemoveAll(dir)
 	}
+
 	if err := os.Chdir(td); err != nil {
 		log.Fatal(err)
 	}
-
 	os.RemoveAll("src")
 	os.RemoveAll("bin")
 
