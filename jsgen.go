@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/j7b/jsgen/travail"
+	"github.com/hajimehoshi/jsgen/travail"
 )
 
 func init() {
