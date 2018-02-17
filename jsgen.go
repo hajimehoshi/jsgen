@@ -36,7 +36,7 @@ func main() {
 			break
 		}
 	}
-	td, err := ioutil.TempDir("/tmp", "jsplayground-")
+	td, err := ioutil.TempDir("", "jsplayground-")
 	if err != nil {
 		log.Fatal(err)
 	}
