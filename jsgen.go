@@ -20,8 +20,6 @@ func init() {
 	log.SetFlags(0)
 }
 
-var gopath, goroot string
-
 func main() {
 	flag.Parse()
 	goexec, err := exec.LookPath("go")
@@ -32,7 +30,6 @@ func main() {
 	for i, s := range env {
 		if strings.HasPrefix(s, "GOPATH") {
 			env[i] = `OLD` + s
-			gopath = s
 			break
 		}
 	}
@@ -48,6 +45,7 @@ func main() {
 		log.Fatal(string(o))
 	}
 	extras := make(map[string]string)
+
 	if fa := flag.Args(); len(fa) > 0 {
 		log.Println("Installing additional packages")
 		args := []string{"get", "-m"}
@@ -68,6 +66,7 @@ func main() {
 			}
 		}
 	}
+
 	cmd = exec.Command(goexec, "env", "GOROOT")
 	o, err = cmd.CombinedOutput()
 	if err != nil {
@@ -101,7 +100,6 @@ func main() {
 	for i, s := range env {
 		if strings.HasPrefix(s, "GOROOT") {
 			env[i] = `OLD` + s
-			goroot = s
 			break
 		}
 	}
