@@ -22,10 +22,12 @@ func init() {
 
 func main() {
 	flag.Parse()
+
 	goexec, err := exec.LookPath("go")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	env := os.Environ()
 	for i, s := range env {
 		if strings.HasPrefix(s, "GOPATH") {
@@ -33,19 +35,22 @@ func main() {
 			break
 		}
 	}
+
 	td, err := ioutil.TempDir("", "jsplayground-")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	log.Printf("Building in %s", td)
+
 	cmd := exec.Command(goexec, "get", "github.com/gopherjs/gopherjs")
 	cmd.Env = append(env, "GOPATH="+td)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(string(o))
 	}
-	extras := make(map[string]string)
 
+	extras := map[string]string{}
 	if fa := flag.Args(); len(fa) > 0 {
 		log.Println("Installing additional packages")
 		args := []string{"get", "-m"}
@@ -72,9 +77,12 @@ func main() {
 	if err != nil {
 		log.Fatal(string(o))
 	}
+
 	gr := filepath.Join(strings.TrimSpace(string(o)), "src")
+
 	log.Printf("Using GOROOT %s", gr)
-	if err = filepath.Walk(gr, func(p string, fi os.FileInfo, err error) error {
+
+	if err := filepath.Walk(gr, func(p string, fi os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -87,11 +95,13 @@ func main() {
 			return err
 		}
 		defer f.Close()
+
 		d, err := os.Create(filepath.Join(td, "src", strings.Replace(p, gr, "", 1)))
 		if err != nil {
 			return err
 		}
 		defer d.Close()
+
 		_, err = io.Copy(d, f)
 		return err
 	}); err != nil {
@@ -103,21 +113,27 @@ func main() {
 			break
 		}
 	}
+
 	args := []string{"install", "-m"}
 	args = append(args, (strings.Split(stdlibs, " "))...)
+
 	cmd = exec.Command(filepath.Join(td, "bin", "gopherjs"), args...)
 	cmd.Env = append(env, "GOROOT="+td)
+
 	o, err = cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(string(o))
 	}
+
 	if err := os.Chdir(filepath.Join(td, "pkg")); err != nil {
 		log.Fatal(err)
 	}
+
 	alldirs, err := filepath.Glob("*")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	dirs, err := filepath.Glob("*_js_min")
 	if err != nil {
 		log.Fatal(err)
@@ -145,8 +161,10 @@ func main() {
 	if err := os.Chdir(td); err != nil {
 		log.Fatal(err)
 	}
+
 	os.RemoveAll("src")
 	os.RemoveAll("bin")
+
 	if len(extras) > 0 {
 		f, err := os.Create(filepath.Join("pkg", "imports.json"))
 		switch {
@@ -158,6 +176,7 @@ func main() {
 			encode(extras)
 		}
 	}
+
 	log.Printf("JS Playground packages at %s", filepath.Join(td, "pkg"))
 }
 
