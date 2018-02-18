@@ -18,18 +18,21 @@ func filtertest(fi os.FileInfo) bool {
 }
 
 func Map(ipath, dir string) (map[string]string, error) {
-	fset := new(token.FileSet)
+	fset := &token.FileSet{}
+
 	pkgs, err := parser.ParseDir(fset, dir, filtertest, parser.AllErrors)
 	if err != nil {
 		return nil, err
 	}
+
 	base := path.Base(dir)
 	pkg := pkgs[base]
 	if pkg == nil {
 		return nil, fmt.Errorf("map: package %s not found", base)
 	}
+
 	ast.PackageExports(pkg)
-	m := make(map[string]string)
+	m := map[string]string{}
 	for _, f := range pkg.Files {
 		for _, d := range f.Decls {
 			switch t := d.(type) {
@@ -37,17 +40,14 @@ func Map(ipath, dir string) (map[string]string, error) {
 				for _, s := range t.Specs {
 					switch t := s.(type) {
 					case *ast.TypeSpec:
-						// log.Println(t.Name)
 						m[fmt.Sprintf("%s.%s", base, t.Name)] = ipath
 					case *ast.ValueSpec:
 						for _, v := range t.Names {
-							//log.Println(v)
 							m[fmt.Sprintf("%s.%s", base, v)] = ipath
 						}
 					}
 				}
 			case *ast.FuncDecl:
-				//log.Println(t.Name)
 				m[fmt.Sprintf("%s.%s", base, t.Name)] = ipath
 			}
 		}

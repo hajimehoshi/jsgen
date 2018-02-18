@@ -7,7 +7,7 @@ import (
 )
 
 func TestMap(t *testing.T) {
-	m, err := Map("github.com/j7b/jsplayground/travail", "../travail")
+	m, err := Map("github.com/hajimehoshi/jsplayground/travail", "../travail")
 	if err != nil {
 		t.Fatal(err)
 	}
